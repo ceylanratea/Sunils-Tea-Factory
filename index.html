@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sunil's Tea Factory | සුනිල්ස් තේ කර්මාන්තශාලාව | Tea Prices & Leaf Routes</title>
+
+  <!-- Tailwind + Bootstrap + Fonts & Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Google Fonts: Sinhala + Modern Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700;14..32,800&family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+      background: radial-gradient(circle at 10% 30%, #1c4d2d, #0a2f1a);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* leaf fall container */
+    .leaf-fall-area {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+
+    .leaf {
+      position: absolute;
+      font-size: 2rem;
+      pointer-events: none;
+      opacity: 0.8;
+      animation: leafFall linear forwards;
+      z-index: 9999;
+    }
+
+    @keyframes leafFall {
+      0% {
+        transform: translateY(-20vh) rotate(0deg);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(120vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* glassmorphism */
+    .glass-card {
+      background: rgba(255, 255, 245, 0.92);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 215, 140, 0.5);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 250, 0.97);
+    }
+
+    /* certificate card style with images */
+    .cert-card {
+      background: #fffef7;
+      border-radius: 1.8rem;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      overflow: hidden;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.2);
+      border-bottom: 6px solid #e6b17e;
+    }
+
+    .cert-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      border-bottom-color: #c97e2a;
+    }
+
+    .cert-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .cert-card:hover .cert-img {
+      transform: scale(1.05);
+    }
+
+    /* glowing buttons */
+    .btn-tea-gold {
+      background: linear-gradient(105deg, #f5b042, #e5941e);
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 60px;
+      transition: 0.25s;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    }
+    .btn-tea-gold:hover {
+      transform: scale(1.05);
+      background: linear-gradient(105deg, #ffb649, #d67e0a);
+    }
+
+    .btn-tea-green {
+      background: linear-gradient(95deg, #2b6e3c, #1e562c);
+      border: none;
+      font-weight: 600;
+    }
+    .btn-tea-green:hover {
+      transform: translateY(-3px);
+      background: #1c4726;
+    }
+
+    .contact-pill {
+      background: white;
+      border-radius: 80px;
+      padding: 0.6rem 1.4rem;
+      transition: all 0.2s;
+      border-left: 6px solid #d4a373;
+    }
+    .contact-pill:hover {
+      background: #fff3e2;
+      transform: translateX(5px);
+    }
+
+    .floating-icon {
+      animation: softFloat 2.5s infinite alternate;
+    }
+    @keyframes softFloat {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-8px); }
+    }
+
+    /* LOADING SCREEN TEA CUP */
+    #loader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #0f3b27;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10000;
+      color: #f9e2b7;
+      transition: opacity 0.5s;
+    }
+    .tea-cup {
+      width: 90px;
+      height: 70px;
+      border: 6px solid #ffefcf;
+      border-radius: 0 0 45px 45px;
+      position: relative;
+      background: rgba(255,240,200,0.1);
+    }
+    .tea-cup::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      top: 14px;
+      width: 22px;
+      height: 32px;
+      border: 6px solid #ffefcf;
+      border-left: none;
+      border-radius: 0 25px 25px 0;
+    }
+    .steam {
+      position: absolute;
+      width: 8px;
+      height: 35px;
+      background: #ffe6b3;
+      top: -45px;
+      left: 35px;
+      animation: steamMove 1.8s infinite;
+      border-radius: 10px;
+      filter: blur(2px);
+    }
+    .steam:nth-child(2) {
+      left: 55px;
+      animation-delay: 0.6s;
+      height: 28px;
+    }
+    @keyframes steamMove {
+      0% { opacity: 0; transform: translateY(0);}
+      50% { opacity: 0.9; transform: translateY(-15px);}
+      100% { opacity: 0; transform: translateY(-30px);}
+    }
+
+    /* Google Translate Custom */
+    .goog-te-gadget-simple {
+      background-color: rgba(255,255,240,0.9) !important;
+      border-radius: 40px !important;
+      padding: 5px 12px !important;
+      font-family: 'Inter', sans-serif !important;
+      border: none !important;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .goog-te-gadget-simple span {
+      color: #2b5e2b !important;
+      font-weight: 600;
+    }
+    .skiptranslate iframe {
+      display: none;
+    }
+    .goog-te-banner-frame {
+      display: none !important;
+    }
+    body {
+      top: 0px !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING SCREEN with Tea Cup Animation -->
+<div id="loader">
+  <div class="tea-cup">
+    <div class="steam"></div>
+    <div class="steam"></div>
+  </div>
+  <h2 class="mt-5 text-2xl font-bold tracking-wide">🍃 Brewing Ceylon Tea...</h2>
+  <p class="text-amber-200 mt-1">Sunils Tea Factory · 25 Years of Trust</p>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      if(loader) loader.style.display = 'none';
+    }, 2200);
+  });
+</script>
+
+<!-- Dynamic Leaf Fall Effect (fresh tea leaves) -->
+<div class="leaf-fall-area" id="leafContainer"></div>
+
+<!-- Main Content Wrapper -->
+<div class="relative z-10 container mx-auto px-4 py-6 md:py-10">
+
+  <!-- Translator Widget (Google Translate) -->
+  <div class="flex justify-end mb-4">
+    <div id="google_translate_element" class="shadow-lg rounded-full bg-white/20 backdrop-blur-sm p-1"></div>
+  </div>
+
+  <!-- Hero Section with Logo -->
+  <div class="text-center mb-12">
+    <!-- Logo Image -->
+    <img src="logo.jpg" alt="Sunils Tea Factory Logo" class="mx-auto mb-4" style="width:130px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
+    <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-1 mb-4 border border-amber-300">
+      <span class="text-amber-100 text-sm font-semibold"><i class="fas fa-leaf text-lime-200 mr-1"></i> Premium Ceylon Tea Estates</span>
+    </div>
+    <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-amber-300 to-orange-400 drop-shadow-2xl" style="font-family: 'Inter';">Sunil's Tea Factory</h1>
+    <div class="sinhala-text text-3xl md:text-4xl font-bold text-amber-100 mt-2">සුනිල්ස් තේ කර්මාන්තශාලාව</div>
+    <div class="w-32 h-1 bg-gradient-to-r from-amber-400 to-green-500 mx-auto mt-5 rounded-full"></div>
+    <div class="flex justify-center gap-3 flex-wrap mt-6">
+      <span class="bg-emerald-800/40 backdrop-blur px-4 py-1.5 rounded-full text-white text-sm"><i class="fas fa-calendar-alt"></i> 25+ වසරක උරුමය</span>
+      <span class="bg-amber-800/40 backdrop-blur px-4 py-1.5 rounded-full text-white text-sm"><i class="fas fa-medal"></i> HACCP · GMP · ISO 22000</span>
+    </div>
+  </div>
+
+  <!-- Description Card (25 years heritage) -->
+  <div class="glass-card p-6 md:p-8 max-w-5xl mx-auto mb-16">
+    <div class="flex flex-col md:flex-row gap-6 items-center">
+      <div class="text-7xl floating-icon"><i class="fas fa-mug-hot text-amber-800"></i>🍃</div>
+      <div class="flex-1 text-center md:text-left">
+        <p class="text-gray-800 text-lg md:text-xl leading-relaxed sinhala-text">
+         සුනිල්ස් තේ කර්මාන්තශාලාව (Sunils Tea Factory)
+
+ඉංගිරිය, ඇදුරගල පිහිටි සුනිල්ස් තේ කර්මාන්තශාලාව (Sunils Tea Factory) වන අප, ISO 22000:2018, HACCP සහ GMP යන ජාත්‍යන්තර තත්ත්ව සහතිකයන්ට අනුකූලව අතිශය සුරක්ෂිත හා ගුණාත්මක තේ නිෂ්පාදනයක නිරත වන්නෙමු. ප්‍රදේශයේ පහතරට තේ වගාකරුවන්ගෙන් ඉතා සූක්ෂ්ම ලෙස තෝරාගනු ලබන හොඳම තේ දලු පමණක් අපගේ නිෂ්පාදන සඳහා භාවිතා කරන අතර, දේශීය හා විදේශීය සංචාරකයින්ට තේ නිෂ්පාදන ක්‍රියාවලිය සජීවීව අත්විඳිය හැකි වන පරිදි තේ ආශ්‍රිත සංචාරක කර්මාන්තය (Tea Tourism) ප්‍රවර්ධනය කිරීමට ද අපි සක්‍රීයව දායකත්වය ලබා දෙන්නෙමු. අපගේ අරමුණ වන්නේ ඉහළම ප්‍රමිතිය සහ ශ්‍රී ලාංකේය තේ කලාවේ විශිෂ්ටත්වය එක් කරමින් ලොවටම සුවිශේෂී තේ අත්දැකීමක් ලබා දීමයි.
+        </p>
+        <div class="flex gap-3 justify-center md:justify-start mt-5">
+          <span class="bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs"><i class="fas fa-star"></i> Quality First</span>
+          <span class="bg-amber-100 text-amber-800 rounded-full px-3 py-1 text-xs"><i class="fas fa-leaf"></i> Eco-friendly</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATES SECTION with images: cert1.jpg, cert2.jpg, cert3.jpg -->
+  <div class="mb-20">
+    <div class="text-center mb-10">
+      <h2 class="text-4xl font-bold text-white inline-block border-b-4 border-amber-400 pb-2"><i class="fas fa-certificate text-yellow-300 mr-2"></i> අපගේ සහතිකපත් / Certificates</h2>
+      <p class="text-amber-100 mt-2">Internationally recognized food safety & quality standards</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div class="cert-card">
+        <img src="cert1.webp" alt="HACCP Certificate" class="cert-img">
+        <div class="p-5 text-center">
+          <h3 class="text-2xl font-black text-amber-800">HACCP</h3>
+          <p class="text-gray-600 text-sm">Hazard Analysis Critical Control Point certified, ensuring tea safety from leaf to cup.</p>
+          <div class="mt-3 inline-block bg-green-700 text-white px-4 py-1 rounded-full text-xs"><i class="fas fa-check-circle"></i> Certified</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <img src="cert2.jpg" alt="GMP Certificate" class="cert-img">
+        <div class="p-5 text-center">
+          <h3 class="text-2xl font-black text-amber-800">GMP</h3>
+          <p class="text-gray-600 text-sm">Good Manufacturing Practices implemented for premium hygiene & tea excellence.</p>
+          <div class="mt-3 inline-block bg-green-700 text-white px-4 py-1 rounded-full text-xs"><i class="fas fa-clipboard-list"></i> Approved</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <img src="cert3.webp" alt="ISO 22000 Certificate" class="cert-img">
+        <div class="p-5 text-center">
+          <h3 class="text-2xl font-black text-amber-800">ISO 22000:2018</h3>
+          <p class="text-gray-600 text-sm">International Food Safety Management – rigorous controls, global benchmarks.</p>
+          <div class="mt-3 inline-block bg-green-700 text-white px-4 py-1 rounded-full text-xs"><i class="fas fa-globe-americas"></i> Accredited</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SECTION: තේ දළු මිලදී ගැනීම සහ පොහොර නිකුත් කිරීම -->
+  <div class="max-w-6xl mx-auto mb-20">
+    <div class="glass-card p-6 md:p-8 bg-gradient-to-r from-[#fef5e7] to-[#fff3e0]">
+      <div class="text-center mb-6">
+        <i class="fas fa-hand-holding-heart text-5xl text-emerald-700 floating-icon"></i>
+        <h2 class="text-3xl md:text-4xl font-bold text-stone-800 mt-2 sinhala-text">තේ දළු මිලදී ගැනීම සහ පොහොර නිකුත් කිරීම</h2>
+        <p class="text-amber-700">Tea Leaf Purchasing & Fertilizer Distribution Services</p>
+      </div>
+      
+      <!-- Office + WhatsApp row -->
+      <div class="grid md:grid-cols-2 gap-5 mb-8">
+        <div class="contact-pill flex items-center gap-4 shadow-md">
+          <div class="bg-green-100 rounded-full w-14 h-14 flex justify-center items-center text-2xl"><i class="fas fa-phone-alt text-green-700"></i></div>
+          <div>
+            <p class="font-bold text-gray-700">කාර්යාලය / Office</p>
+            <a href="tel:0342269587" class="text-xl font-mono font-semibold text-green-800 hover:text-amber-700 transition">034 226 9587</a>
+          </div>
+        </div>
+        <div class="contact-pill flex items-center gap-4 shadow-md">
+          <div class="bg-green-100 rounded-full w-14 h-14 flex justify-center items-center text-2xl"><i class="fab fa-whatsapp text-green-600"></i></div>
+          <div>
+            <p class="font-bold text-gray-700">WhatsApp</p>
+            <a href="https://wa.me/94763597334" target="_blank" class="text-xl font-mono font-semibold text-green-800 hover:text-amber-700">076 359 7334</a>
+            <span class="text-xs text-gray-500 block"><i class="fas fa-comment-dots"></i> ක්ෂණික පණිවුඩ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two separate cards: Tea Price Info & Leaf Route Info (Field Officer) -->
+      <div class="grid md:grid-cols-2 gap-6 mt-2">
+        <!-- Card 1: Tea Price Information -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border-t-4 border-amber-500 hover:shadow-xl transition">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-chart-line text-3xl text-amber-600"></i>
+            <h3 class="text-2xl font-bold text-stone-800 sinhala-text">තේ මිල ගණන් පිළිබඳ දැනුවත් වීම</h3>
+          </div>
+          <p class="text-gray-600 mb-4">Daily tea prices, auction rates & market updates. Click below to get real-time information.</p>
+          <a href="https://ceylanratea.github.io/Tea-menu/" target="_blank" class="btn-tea-gold inline-flex items-center gap-2 px-5 py-2 text-base"><i class="fas fa-eye"></i> මිල ගණන් බලන්න</a>
+          <div class="mt-3 text-xs text-amber-700"><i class="fas fa-chart-simple"></i> නවතම තේ මිල වාර්තා</div>
+        </div>
+
+        <!-- Card 2: Leaf Route Information + Field Officer (MODIFIED: added link to full leaf routes page) -->
+        <div class="bg-white rounded-2xl p-5 shadow-md border-t-4 border-green-600 hover:shadow-xl transition">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-map-marked-alt text-3xl text-green-700"></i>
+            <h3 class="text-2xl font-bold text-stone-800 sinhala-text">දළු මාර්ග පිළිබඳ දැනුවත් වීම</h3>
+          </div>
+          <p class="text-gray-600 mb-3">Leaf collection routes, village schedules & transport guidance. Contact Field Officer for route details.</p>
+          <div class="bg-green-50 rounded-xl p-3 flex items-center gap-3 mb-3">
+            <i class="fas fa-user-check text-3xl text-amber-700"></i>
+            <div>
+              <p class="font-bold text-gray-800 sinhala-text">ක්ෂේත්‍ර නිලදාරී (Field Officer)</p>
+              <a href="tel:0760357755" class="text-2xl font-bold text-green-700 hover:text-amber-600">076 035 7755</a>
+              <p class="text-xs text-gray-500"><i class="fas fa-road"></i> දළු මාර්ග සහ එකතු කිරීමේ ස්ථාන</p>
+            </div>
+          </div>
+          <a href="tel:0760357755" class="btn-tea-green text-white px-4 py-2 rounded-full inline-flex items-center gap-2 text-sm shadow"><i class="fas fa-phone-alt"></i> දළු මාර්ග සඳහා අමතන්න</a>
+          
+          <!-- NEW: Link to the detailed leaf routes page (dalu ekathu kirima saha dalu marga) -->
+          <a href="dalu-maarga.html" class="mt-3 w-full inline-flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 px-4 rounded-full transition shadow-md text-sm">
+            <i class="fas fa-list-ul"></i> සියලු දළු මාර්ග සහ එකතු කිරීමේ ස්ථාන බලන්න
+          </a>
+        </div>
+      </div>
+
+      <!-- Manager Card remains below for completeness -->
+      <div class="mt-6 bg-white/70 p-4 rounded-2xl shadow flex items-center gap-4 transition-all hover:scale-[1.01]">
+        <i class="fas fa-user-tie text-4xl text-amber-800"></i>
+        <div>
+          <h4 class="font-bold text-gray-800 sinhala-text">කළමනාකාරතුමා (General Manager)</h4>
+          <a href="tel:0763335365" class="text-xl font-bold text-green-700 hover:text-amber-600">076 333 5365</a>
+          <p class="text-xs text-gray-500">Administrative & strategic support</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facebook Pages Section -->
+  <div class="max-w-5xl mx-auto mb-20">
+    <div class="text-center mb-6">
+      <h2 class="text-4xl font-bold text-white"><i class="fab fa-facebook-square text-4xl text-blue-300"></i> Facebook සමාජ මාධ්‍ය</h2>
+      <p class="text-amber-100">Join our official tea community</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6">
+      <a href="https://www.facebook.com/p/Sunils-Tea-Center-100063906521637/" target="_blank" class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#3b5998] to-[#2d4373] p-[2px] transition hover:scale-105 w-72">
+        <div class="bg-white/95 rounded-xl p-4 flex items-center gap-3 h-full">
+          <i class="fab fa-facebook-f text-3xl text-[#3b5998]"></i>
+          <div class="flex-1">
+            <p class="font-bold text-gray-800">Sunils Tea Center</p>
+            <p class="text-xs text-gray-500">Official Brand Page</p>
+          </div>
+          <span class="bg-amber-600 text-white px-3 py-1 rounded-full text-xs">Visit</span>
+        </div>
+      </a>
+      <a href="https://www.facebook.com/people/Sunils-Tea-Agriculture-Unit/100090102949218/" target="_blank" class="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#3b5998] to-[#2d4373] p-[2px] transition hover:scale-105 w-72">
+        <div class="bg-white/95 rounded-xl p-4 flex items-center gap-3 h-full">
+          <i class="fab fa-facebook-f text-3xl text-[#3b5998]"></i>
+          <div class="flex-1">
+            <p class="font-bold text-gray-800">Sunils Tea Agriculture</p>
+            <p class="text-xs text-gray-500">Tea Plantation Unit</p>
+          </div>
+          <span class="bg-amber-600 text-white px-3 py-1 rounded-full text-xs">Visit</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center text-white/80 border-t border-amber-400/30 pt-8 pb-5 mt-8">
+    <div class="flex justify-center gap-4 flex-wrap mb-2">
+      <i class="fas fa-leaf text-green-300"></i>
+      <span class="sinhala-text">වසර 25ක පුරා දිගු විශ්වාසය | 25 Years of Trust & Excellence</span>
+      <i class="fas fa-award text-amber-300"></i>
+    </div>
+    <p class="text-sm">🍃 Sunil's Tea Factory – Authentic Ceylon Tea, Global Standards. HACCP • GMP • ISO 22000:2018 Certified</p>
+    <p class="text-xs mt-2">© 2026 Sunil's Tea Factory | Crafted with tradition & leaf harmony</p>
+  </footer>
+</div>
+
+<!-- Floating Action Buttons (WhatsApp + Call) -->
+<a href="https://wa.me/94763597334" target="_blank" class="fixed bottom-24 right-5 bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow-xl z-50 hover:bg-green-700 transition-all hover:scale-110" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+<a href="tel:0342269587" class="fixed bottom-8 right-5 bg-amber-600 text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl shadow-xl z-50 hover:bg-amber-700 transition-all hover:scale-110" aria-label="Call"><i class="fas fa-phone-alt"></i></a>
+
+<!-- Leaf Fall Script -->
+<script>
+  const leafContainer = document.getElementById('leafContainer');
+  const leafTypes = ['🍃', '🍂', '🌿', '🍃', '🍃', '🌱', '🍂'];
+
+  function createLeaf() {
+    if (!leafContainer) return;
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    const randomLeaf = leafTypes[Math.floor(Math.random() * leafTypes.length)];
+    leaf.innerHTML = randomLeaf;
+    const size = Math.random() * 28 + 18;
+    leaf.style.fontSize = size + 'px';
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.animationDuration = Math.random() * 6 + 4 + 's';
+    leaf.style.animationDelay = Math.random() * 0.8 + 's';
+    leaf.style.opacity = Math.random() * 0.7 + 0.3;
+    leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+    leafContainer.appendChild(leaf);
+    leaf.addEventListener('animationend', () => leaf.remove());
+  }
+
+  setInterval(() => {
+    if (document.visibilityState === 'visible') createLeaf();
+  }, 550);
+
+  window.addEventListener('load', () => {
+    for (let i = 0; i < 18; i++) setTimeout(() => createLeaf(), i * 150);
+  });
+</script>
+
+<!-- Google Translate Script -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'si',
+      includedLanguages: 'en,si,ta,hi,fr,de,ja,ar',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
